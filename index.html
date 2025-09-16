@@ -1,1615 +1,1331 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memorizador de Seguridad Informática</title>
+    <title>Juego de Redes y Seguridad</title>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #34495e;
-            --success-color: #2ecc71;
-            --warning-color: #f39c12;
-        }
-        
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background-color: var(--light-color);
-            color: var(--dark-color);
-            line-height: 1.6;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
         
         .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 90%;
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
+            padding: 30px;
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         h1 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
             font-size: 2.5rem;
-            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .screen {
+            display: none;
+        }
+        
+        #start-screen {
+            display: block;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 15px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+        
+        .option-btn:hover {
+            background-color: #e9ecef;
+            border-color: #1a2a6c;
+        }
+        
+        .option-btn.selected {
+            background-color: #1a2a6c;
+            color: white;
+            border-color: #1a2a6c;
+        }
+        
+        .option-btn.correct {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        
+        .option-btn.incorrect {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
         }
         
         .stats {
             display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-        
-        .question-container {
-            background-color: white;
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .question-text {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-        
-        .options-container {
-            display: grid;
-            grid-gap: 10px;
-        }
-        
-        .option {
-            padding: 15px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .option:hover {
-            background-color: #e9ecef;
-            transform: translateY(-2px);
-        }
-        
-        .option.correct {
-            background-color: var(--success-color);
-            color: white;
-        }
-        
-        .option.incorrect {
-            background-color: var(--accent-color);
-            color: white;
-        }
-        
-        .explanation {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-left: 4px solid var(--secondary-color);
-            border-radius: 4px;
-            display: none;
-        }
-        
-        .controls {
-            display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            margin: 20px 0;
+            font-size: 1.2rem;
         }
         
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        
-        button:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-        
-        .btn-next {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-        
-        .btn-show-answer {
-            background-color: var(--warning-color);
-            color: white;
-        }
-        
-        .btn-add-question {
-            background-color: var(--success-color);
-            color: white;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .modal h2 {
-            margin-bottom: 20px;
-            color: var(--primary-color);
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
+        .question {
+            font-size: 1.3rem;
+            margin: 20px 0;
+            color: #343a40;
             font-weight: 500;
         }
         
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+        .feedback {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
         }
         
-        .modal-buttons {
+        .feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .score-display {
+            font-size: 2rem;
+            margin: 20px 0;
+            color: #1a2a6c;
+        }
+        
+        .category {
+            display: inline-block;
+            background-color: #1a2a6c;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            color: #b21f1f;
+            margin: 10px 0;
+        }
+        
+        .filter-container {
+            margin: 20px 0;
             display: flex;
-            justify-content: flex-end;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 10px;
-            margin-top: 20px;
         }
         
-        .btn-cancel {
-            background-color: #6c757d;
-            color: white;
-        }
-        
-        .btn-submit {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-        
-        .progress-bar {
-            height: 10px;
+        .filter-btn {
             background-color: #e9ecef;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            overflow: hidden;
+            border: 2px solid #dee2e6;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
         
-        .progress {
-            height: 100%;
-            background-color: var(--secondary-color);
-            border-radius: 5px;
-            transition: width 0.3s ease;
+        .filter-btn.active {
+            background-color: #1a2a6c;
+            color: white;
+            border-color: #1a2a6c;
         }
         
         @media (max-width: 600px) {
             .container {
-                padding: 10px;
-            }
-            
-            .question-container {
+                width: 95%;
                 padding: 15px;
             }
             
-            .controls {
-                flex-direction: column;
-                gap: 10px;
+            h1 {
+                font-size: 2rem;
             }
             
-            button {
-                width: 100%;
+            .btn {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+            
+            .question {
+                font-size: 1.1rem;
+            }
+            
+            .filter-container {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Memorizador de Seguridad Informática</h1>
-            <p>Practica y memoriza conceptos clave de seguridad informática</p>
-        </header>
-        
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-label">Preguntas</div>
-                <div class="stat-value" id="current-question">1</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Correctas</div>
-                <div class="stat-value" id="correct-answers">0</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-label">Porcentaje</div>
-                <div class="stat-value" id="accuracy">0%</div>
+        <div id="start-screen" class="screen">
+            <h1>Juego de Redes y Seguridad</h1>
+            <p>Pon a prueba tus conocimientos sobre redes, seguridad informática y hacking</p>
+            <button id="start-btn" class="btn">Comenzar Juego</button>
+            <button id="instructions-btn" class="btn">Instrucciones</button>
+            
+            <div class="filter-container">
+                <h3>Filtrar por categoría:</h3>
+                <button class="filter-btn active" data-category="all">Todas</button>
+                <button class="filter-btn" data-category="Conceptos Básicos">Conceptos</button>
+                <button class="filter-btn" data-category="Protocolos">Protocolos</button>
+                <button class="filter-btn" data-category="Seguridad">Seguridad</button>
+                <button class="filter-btn" data-category="Tipos de Hackers">Hackers</button>
+                <button class="filter-btn" data-category="Direccionamiento">Direccionamiento</button>
             </div>
         </div>
         
-        <div class="progress-bar">
-            <div class="progress" id="progress-bar"></div>
+        <div id="instructions-screen" class="screen">
+            <h1>Instrucciones</h1>
+            <p>Responde correctamente a las preguntas sobre redes y seguridad.</p>
+            <p>Cada pregunta tiene varias opciones. Selecciona la respuesta correcta.</p>
+            <p>Obtendrás puntos por cada respuesta correcta.</p>
+            <p>¡Demuestra tus conocimientos!</p>
+            <button id="back-btn" class="btn">Volver al Inicio</button>
         </div>
         
-        <div class="question-container">
-            <div class="question-text" id="question-text"></div>
-            <div class="options-container" id="options-container"></div>
-            <div class="explanation" id="explanation"></div>
-            <div class="controls">
-                <button class="btn-show-answer" id="btn-show-answer">Mostrar Respuesta</button>
-                <button class="btn-next" id="btn-next">Siguiente Pregunta</button>
-                <button class="btn-add-question" id="btn-add-question">Añadir Pregunta</button>
+        <div id="game-screen" class="screen">
+            <div class="category" id="category">Redes</div>
+            <div class="timer" id="timer">Tiempo: 30s</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
             </div>
+            <div class="stats">
+                <span id="question-count">Pregunta 1/20</span>
+                <span id="score">Puntuación: 0</span>
+            </div>
+            <div class="question" id="question"></div>
+            <div id="options-container"></div>
+            <button id="next-btn" class="btn" style="display: none;">Siguiente</button>
         </div>
-    </div>
-    
-    <div class="modal" id="add-question-modal">
-        <div class="modal-content">
-            <h2>Añadir Nueva Pregunta</h2>
-            <form id="add-question-form">
-                <div class="form-group">
-                    <label for="question">Pregunta:</label>
-                    <textarea id="question" rows="3" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="options">Opciones (separadas por coma):</label>
-                    <input type="text" id="options" required>
-                </div>
-                <div class="form-group">
-                    <label for="correct-option">Opción Correcta (número):</label>
-                    <input type="number" id="correct-option" min="1" max="4" required>
-                </div>
-                <div class="form-group">
-                    <label for="explanation">Explicación:</label>
-                    <textarea id="explanation-input" rows="3" required></textarea>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="btn-cancel" id="btn-cancel">Cancelar</button>
-                    <button type="submit" class="btn-submit">Añadir Pregunta</button>
-                </div>
-            </form>
+        
+        <div id="results-screen" class="screen">
+            <h1>Resultados</h1>
+            <div class="score-display" id="final-score">Puntuación: 0/20</div>
+            <p id="result-message"></p>
+            <button id="restart-btn" class="btn">Jugar de Nuevo</button>
+            <button id="home-btn" class="btn">Volver al Inicio</button>
         </div>
     </div>
 
     <script>
-        // Base de datos inicial de preguntas (ampliada con las del documento)
-        let questions = [
-            {
-                question: "El estándar ISO 27000 se encarga de...",
-                options: [
-                    "Regular el accionar de los hackers.",
-                    "Establecer el hacking ético como premisa en todas las empresas.",
-                    "Establecer parámetros para la configuración correcta de redes.",
-                    "Establecer parámetros para garantizar la seguridad de la información."
-                ],
-                correctOption: 3,
-                explanation: "La familia ISO 27000 define mejores prácticas para gestionar la seguridad de la información (SGSI), no el hacking o configuraciones específicas."
-            },
-            {
-                question: "HTTPS, SSH, PPTP, TCP/IP son ejemplos de...",
-                options: [
-                    "Dispositivos",
-                    "Protocolos",
-                    "Medios",
-                    "Herramientas"
-                ],
-                correctOption: 1,
-                explanation: "Son normas de comunicación (ej: HTTPS para web seguro, SSH para conexiones remotas)."
-            },
-            {
-                question: "Hardware que permite la comunicación entre nodos de una red.",
-                options: [
-                    "Dispositivos",
-                    "Tecnologías",
-                    "Herramientas",
-                    "Medios",
-                    "Protocolos"
-                ],
-                correctOption: 0,
-                explanation: "Routers, switches, etc., son dispositivos físicos que interconectan nodos."
-            },
-            {
-                question: "Técnica que permite cifrar mensajes.",
-                options: [
-                    "Criptoanálisis",
-                    "Criptología",
-                    "Criptografía"
-                ],
-                correctOption: 2,
-                explanation: "La criptografía se enfoca en el cifrado para confidencialidad."
-            },
-            {
-                question: "Ventaja de trabajar con banda de 2.4GHz.",
-                options: [
-                    "El índice de absorción de obstáculos como paredes es menor que el de 5GHz.",
-                    "No requiere del uso de tarjetas de red.",
-                    "Tiene un menor alcance.",
-                    "Existen menos dispositivos comerciales en esta banda, lo que lo hace menos susceptible a interferencias."
-                ],
-                correctOption: 0,
-                explanation: "Las ondas de 2.4GHz penetran mejor obstáculos debido a su mayor longitud de onda."
-            },
+        // Base de datos de preguntas (más de 100 preguntas del PDF)
+        const allQuestions = [
             {
                 question: "Conjunto de saberes prácticos o procedimientos para obtener el resultado deseado.",
-                options: [
-                    "Medios",
-                    "Técnicas",
-                    "Protocolos",
-                    "Tecnologías",
-                    "Herramientas"
-                ],
-                correctOption: 1,
-                explanation: "Las técnicas son procedimientos que requieren destreza manual y/o intelectual."
+                options: ["Medios", "Técnicas", "Protocolos", "Tecnologías", "Herramientas"],
+                answer: 1,
+                category: "Conceptos Básicos"
             },
             {
-                question: "Es un conjunto de reglas y normas que permiten que dos o más entidades se comuniquen.",
-                options: [
-                    "Dispositivos",
-                    "Técnicas",
-                    "Protocolos",
-                    "Tecnologías",
-                    "Herramientas"
-                ],
-                correctOption: 2,
-                explanation: "Los protocolos definen la sintaxis, semántica y sincronización de la comunicación."
+                question: "Es un conjunto de reglas y normas que permiten que dos o más entidades de un sistema de comunicación se comuniquen entre ellos.",
+                options: ["Dispositivos", "Técnicas", "Protocolos", "Tecnologías", "Herramientas"],
+                answer: 2,
+                category: "Protocolos"
             },
             {
                 question: "Son programas, aplicaciones o instrucciones usadas para efectuar otras tareas de modo más sencillo.",
-                options: [
-                    "Dispositivos",
-                    "Técnicas",
-                    "Protocolos",
-                    "Tecnologías",
-                    "Herramientas"
-                ],
-                correctOption: 4,
-                explanation: "Antivirus, antispyware y firewall son ejemplos de herramientas."
+                options: ["Dispositivos", "Técnicas", "Protocolos", "Tecnologías", "Herramientas"],
+                answer: 4,
+                category: "Herramientas"
             },
             {
-                question: "Concepto que abarca un conjunto de técnicas, conocimientos y procesos, que sirven para el diseño y construcción de objetos.",
-                options: [
-                    "Medios",
-                    "Técnicas",
-                    "Protocolos",
-                    "Tecnologías",
-                    "Herramientas"
-                ],
-                correctOption: 3,
-                explanation: "La tecnología sirve para satisfacer necesidades humanas mediante objetos construidos."
+                question: "Concepto que abarca un conjunto de técnicas, conocimientos y procesos, que sirven para el diseño y construcción de objetos para satisfacer necesidades humanas.",
+                options: ["Medios", "Técnicas", "Protocolos", "Tecnologías", "Herramientas"],
+                answer: 3,
+                category: "Tecnologías"
             },
             {
-                question: "Es el soporte o forma de conexión que permite la transferencia de datos entre dos dispositivos.",
-                options: [
-                    "Medios",
-                    "Técnicas",
-                    "Protocolos",
-                    "Tecnologías",
-                    "Herramientas"
-                ],
-                correctOption: 0,
-                explanation: "Fibra óptica, par trenzado, coaxial son ejemplos de medios."
+                question: "Es el soporte o forma de conexión que permite la transferencia de datos entre dos dispositivos o nodos en una red.",
+                options: ["Medios", "Técnicas", "Protocolos", "Tecnologías"],
+                answer: 0,
+                category: "Medios de Transmisión"
             },
             {
-                question: "Es el hardware que permite la comunicación entre los nodos de una red.",
-                options: [
-                    "Protocolos",
-                    "Herramientas",
-                    "Medios",
-                    "Dispositivos"
-                ],
-                correctOption: 3,
-                explanation: "Router, switch, hub son ejemplos de dispositivos."
+                question: "Es el hardware que permite la comunicación entre los nodos de una red. Router, switch, hub son ejemplos de...",
+                options: ["Protocolos", "Herramientas", "Medios", "Dispositivos"],
+                answer: 3,
+                category: "Dispositivos de Red"
             },
             {
                 question: "¿Cuál es la capa que enruta los paquetes de acuerdo a las direcciones de red lógicas?",
-                options: [
-                    "Aplicación",
-                    "Red",
-                    "Física",
-                    "Transporte"
-                ],
-                correctOption: 1,
-                explanation: "La capa de red se encarga del enrutamiento de paquetes."
+                options: ["Aplicación", "Red", "Física", "Transporte"],
+                answer: 1,
+                category: "Modelo OSI"
             },
             {
                 question: "Es el identificador único o dirección física que cada fabricante asigna a un dispositivo.",
-                options: [
-                    "Dirección IP",
-                    "Dirección MAC",
-                    "Dirección de correo",
-                    "Dirección de red"
-                ],
-                correctOption: 1,
-                explanation: "La dirección MAC es única para cada dispositivo de red."
-            },
-            {
-                question: "¿Cuáles de las conexiones utilizan cable de conexión directa?",
-                options: [
-                    "Computadora - Hub",
-                    "Hub - Switch",
-                    "Computadora - Router",
-                    "Switch - Router"
-                ],
-                correctOption: 0,
-                explanation: "Computadora - Hub y Switch - Router utilizan cable de conexión directa."
+                options: ["Dirección IP", "Dirección MAC", "Dirección de correo", "Dirección de red"],
+                answer: 1,
+                category: "Direccionamiento"
             },
             {
                 question: "Comerciante de la red. No posee conocimientos informáticos, pero sí de negocios.",
-                options: [
-                    "Lammer",
-                    "Bucanero",
-                    "Hacker de sombrero gris",
-                    "Phreaker"
-                ],
-                correctOption: 1,
-                explanation: "Los bucaneros revenden productos de copyhackers para beneficio económico."
+                options: ["Laminar", "Bucanero", "Hacker de sombrero gris", "Phreaker"],
+                answer: 1,
+                category: "Tipos de Hackers"
             },
             {
                 question: "Son Hackers que dependiendo de sus intereses pueden trabajar como hackers éticos o crackers.",
-                options: [
-                    "Hacker de sombrero negro",
-                    "Hacker de sombrero blanco",
-                    "Hacker de sombrero gris",
-                    "Phreaker"
-                ],
-                correctOption: 2,
-                explanation: "Los hackers de sombrero gris tienen una ética ambigua."
+                options: ["Hacker de sombrero negro", "Hacker de sombrero blanco", "Hacker de sombrero gris", "Phreaker"],
+                answer: 2,
+                category: "Tipos de Hackers"
             },
             {
-                question: "Persona falta de habilidades técnicas que pretende obtener beneficio del hacking sin conocimientos.",
-                options: [
-                    "Lammer",
-                    "Bucanero",
-                    "Hacker de sombrero gris",
-                    "Phreaker"
-                ],
-                correctOption: 0,
-                explanation: "Los lammers buscan y descargan programas de intrusión sin conocimientos técnicos."
+                question: "Persona falta de habilidades técnicas, generalmente no competente en la materia.",
+                options: ["Laminar", "Bucanero", "Hacker de sombrero gris", "Phreaker"],
+                answer: 0,
+                category: "Tipos de Hackers"
             },
             {
                 question: "También conocidos como 'crackers' muestran sus habilidades rompiendo sistemas de seguridad.",
-                options: [
-                    "Hacker de sombrero negro",
-                    "Hacker de sombrero blanco",
-                    "Hacker de sombrero gris",
-                    "Phreaker"
-                ],
-                correctOption: 0,
-                explanation: "Los hackers de sombrero negro actúan para su propio beneficio."
+                options: ["Hacker de sombrero negro", "Hacker de sombrero blanco", "Hacker de sombrero gris", "Phreaker"],
+                answer: 0,
+                category: "Tipos de Hackers"
             },
             {
-                question: "Es una persona que con amplios conocimientos de telefonía puede realizar actividades no autorizadas.",
-                options: [
-                    "Hacker de sombrero negro",
-                    "Hacker de sombrero blanco",
-                    "Hacker de sombrero gris",
-                    "Phreaker"
-                ],
-                correctOption: 3,
-                explanation: "Los phreakers realizan actividades no autorizadas con teléfonos."
+                question: "Es una persona que con amplios conocimientos de telefonía puede llegar a realizar actividades no autorizadas con los teléfonos.",
+                options: ["Hacker de sombrero negro", "Hacker de sombrero blanco", "Hacker de sombrero gris", "Phreaker"],
+                answer: 3,
+                category: "Tipos de Hackers"
             },
             {
-                question: "Son 'hackers éticos' que respetan la ética hacker centrada en asegurar sistemas TIC.",
-                options: [
-                    "Hacker de sombrero negro",
-                    "Hacker de sombrero blanco",
-                    "Hacker de sombrero gris",
-                    "Phreaker"
-                ],
-                correctOption: 1,
-                explanation: "Los hackers de sombrero blanco trabajan para proteger sistemas."
+                question: "Son 'hackers éticos' que respetan la ética hacker que se centra en asegurar y proteger los sistemas.",
+                options: ["Hacker de sombrero negro", "Hacker de sombrero blanco", "Hacker de sombrero gris", "Phreaker"],
+                answer: 1,
+                category: "Tipos de Hackers"
             },
             {
                 question: "¿Cómo se denomina a los eventos que pueden causar alteraciones a la información de la organización?",
-                options: [
-                    "Seguridad en redes",
-                    "Vulnerabilidad",
-                    "Amenaza",
-                    "Ataque",
-                    "Riesgo tecnológico"
-                ],
-                correctOption: 2,
-                explanation: "Las amenazas pueden ocasionar pérdidas materiales, económicas o de información."
+                options: ["Seguridad en redes", "Vulnerabilidad", "Amenaza", "Ataque", "Riesgo tecnológico"],
+                answer: 2,
+                category: "Seguridad"
             },
             {
                 question: "¿Cómo se denomina al grado de debilidad inherente a cada red y dispositivo?",
-                options: [
-                    "Seguridad en redes",
-                    "Vulnerabilidad",
-                    "Amenaza",
-                    "Ataque",
-                    "Riesgo tecnológico"
-                ],
-                correctOption: 1,
-                explanation: "La vulnerabilidad brinda la posibilidad de que una amenaza se materialice."
+                options: ["Seguridad en redes", "Vulnerabilidad", "Amenaza", "Ataque", "Riesgo tecnológico"],
+                answer: 1,
+                category: "Seguridad"
             },
             {
                 question: "¿Cómo se denomina al acto de agresión contra una red o sistema usando herramientas específicas?",
-                options: [
-                    "Seguridad en redes",
-                    "Vulnerabilidad",
-                    "Amenaza",
-                    "Ataque",
-                    "Riesgo tecnológico"
-                ],
-                correctOption: 3,
-                explanation: "El atque es el método por el cual un individuo intenta dañar una red."
+                options: ["Seguridad en redes", "Vulnerabilidad", "Amenaza", "Ataque", "Riesgo tecnológico"],
+                answer: 3,
+                category: "Seguridad"
             },
             {
-                question: "¿Cómo se denomina a la probabilidad de que una amenaza se materialice, utilizando vulnerabilidades?",
-                options: [
-                    "Seguridad en redes",
-                    "Vulnerabilidad",
-                    "Amenaza",
-                    "Ataque",
-                    "Riesgo tecnológico"
-                ],
-                correctOption: 4,
-                explanation: "El riesgo tecnológico genera pérdidas o daños a los activos."
+                question: "¿Cómo se denomina a la probabilidad de que una amenaza se materialice, utilizando vulnerabilidades existentes?",
+                options: ["Seguridad en redes", "Vulnerabilidad", "Amenaza", "Ataque", "Riesgo tecnológico"],
+                answer: 4,
+                category: "Seguridad"
             },
             {
-                question: "¿Cómo se llama al servicio cuya tarea es mantener la continuidad de acceso a la información?",
-                options: [
-                    "Autenticación",
-                    "No repudio",
-                    "Integridad",
-                    "Disponibilidad",
-                    "Confidencialidad"
-                ],
-                correctOption: 3,
-                explanation: "La disponibilidad garantiza el acceso continuo a la información."
+                question: "¿Cómo se llama al servicio cuya tarea es mantener la continuidad de acceso a los elementos de información?",
+                options: ["Autenticación", "No repudio", "Integridad", "Disponibilidad", "Confidencialidad"],
+                answer: 3,
+                category: "Servicios de Seguridad"
             },
             {
-                question: "¿Cómo se llama al servicio cuya tarea es mantener la información fuera del alcance de no autorizados?",
-                options: [
-                    "Autenticación",
-                    "No repudio",
-                    "Integridad",
-                    "Disponibilidad",
-                    "Confidencialidad"
-                ],
-                correctOption: 4,
-                explanation: "La confidencialidad protege la información de accesos no autorizados."
+                question: "¿Cómo se llama al servicio cuya tarea es mantener la información fuera del alcance de personas no autorizadas?",
+                options: ["Autenticación", "No repudio", "Integridad", "Disponibilidad", "Confidencialidad"],
+                answer: 4,
+                category: "Servicios de Seguridad"
             },
             {
-                question: "¿Cómo se llama al servicio cuya tarea es asegurar que la información recibida sea la misma que la enviada?",
-                options: [
-                    "Autenticación",
-                    "No repudio",
-                    "Integridad",
-                    "Disponibilidad",
-                    "Confidencialidad"
-                ],
-                correctOption: 2,
-                explanation: "La integridad garantiza que la información no sea alterada."
+                question: "¿Cómo se llama al servicio cuya tarea es asegurar que la información recibida sea la misma que la que fue enviada?",
+                options: ["Autenticación", "No repudio", "Integridad", "Disponibilidad", "Confidencialidad"],
+                answer: 2,
+                category: "Servicios de Seguridad"
             },
             {
                 question: "¿Cuál es el algoritmo de cifrado asimétrico más robusto y más utilizado?",
-                options: [
-                    "RSA",
-                    "FUNCIÓN HASH",
-                    "AES",
-                    "SHA - 512"
-                ],
-                correctOption: 0,
-                explanation: "RSA es el algoritmo de cifrado asimétrico más utilizado."
+                options: ["RSA", "FUNCIÓN HASH", "AES", "SHA - 512"],
+                answer: 0,
+                category: "Criptografía"
             },
             {
                 question: "Es la ciencia que estudia la criptografía y el criptoanálisis.",
-                options: [
-                    "Función Hash",
-                    "Algoritmos de cifrado simétrico",
-                    "Algoritmos de cifrado asimétrico",
-                    "Criptología"
-                ],
-                correctOption: 3,
-                explanation: "La criptología estudia tanto la criptografía como el criptoanálisis."
+                options: ["Función Hash", "Algoritmos de cifrado simétrico", "Algoritmos de cifrado asimétrico", "Criptología"],
+                answer: 3,
+                category: "Criptografía"
             },
             {
                 question: "¿Cuál es el algoritmo de cifrado simétrico más robusto y más utilizado?",
-                options: [
-                    "RSA",
-                    "FUNCIÓN HASH",
-                    "AES",
-                    "SHA - 512"
-                ],
-                correctOption: 2,
-                explanation: "AES es el algoritmo de cifrado simétrico más robusto."
+                options: ["RSA", "FUNCIÓN HASH", "AES", "SHA - 512"],
+                answer: 2,
+                category: "Criptografía"
             },
             {
                 question: "Es el estudio de los métodos para obtener el sentido de la información cifrada.",
-                options: [
-                    "Criptoanálisis",
-                    "Criptografía",
-                    "Criptología",
-                    "Encriptación"
-                ],
-                correctOption: 0,
-                explanation: "El criptoanálisis busca descifrar información sin autorización."
+                options: ["Criptoanálisis", "Criptografía", "Criptología", "Encriptación"],
+                answer: 0,
+                category: "Criptografía"
             },
             {
                 question: "¿Qué función se encarga de obtener el sentido de la información cifrada?",
-                options: [
-                    "Criptografía",
-                    "Criptoanálisis",
-                    "Criptología",
-                    "Encriptación"
-                ],
-                correctOption: 1,
-                explanation: "El criptoanálisis se enfoca en descifrar información."
+                options: ["Criptografía", "Criptoanálisis", "Criptología", "Encriptación"],
+                answer: 1,
+                category: "Criptografía"
             },
             {
                 question: "Como se denomina a la técnica, que permite cifrar mensajes.",
-                options: [
-                    "Criptografía",
-                    "Criptología",
-                    "Criptoanálisis"
-                ],
-                correctOption: 0,
-                explanation: "La criptografía permite cifrar mensajes para proteger su confidencialidad."
+                options: ["Criptografía", "Criptología", "Criptoanálisis"],
+                answer: 0,
+                category: "Criptografía"
             },
             {
                 question: "¿Qué capa o capas del modelo OSI contribuyen a la seguridad de una red?",
-                options: [
-                    "Red",
-                    "Transporte",
-                    "Física",
-                    "Todas"
-                ],
-                correctOption: 3,
-                explanation: "Todas las capas del modelo OSI pueden contribuir a la seguridad de la red."
+                options: ["Red", "Transporte", "Física", "Todas"],
+                answer: 3,
+                category: "Modelo OSI"
             },
             {
                 question: "El estandar ISO 27000 se encarga de...",
-                options: [
-                    "Regular el accionar de los hackers.",
-                    "Establecer parámetros para garantizar la seguridad de la información.",
-                    "Establecer parámetros para la configuración correcta de redes.",
-                    "Establecer el hacking ético como premisa en todas las empresas."
-                ],
-                correctOption: 1,
-                explanation: "ISO 27000 establece parámetros para la seguridad de la información."
+                options: ["Regular el accionar de los hackers.", "Establecer parámetros para garantizar la seguridad de la información.", "Establecer parámetros para la configuración correcta de redes.", "Establecer el hacking ético como premisa en todas las empresas."],
+                answer: 1,
+                category: "Estándares"
             },
             {
-                question: "La seguridad informática tiene como objetivo principal proteger la información de una organización.",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 1,
-                explanation: "La seguridad informática protege infraestructura, no solo información."
+                question: "La seguridad informática tiene como objetivo principal proteger la información de una organización a través de un lineamiento estratégico.",
+                options: ["Verdadero", "Falso"],
+                answer: 0,
+                category: "Seguridad"
             },
             {
-                question: "La seguridad de la información tiene como objetivo primario proteger infraestructuras tecnológicas.",
-                options: [
-                    "Falso",
-                    "Verdadero"
-                ],
-                correctOption: 0,
-                explanation: "La seguridad de la información protege la información, no solo la infraestructura."
+                question: "La seguridad de la información tiene como objetivo primario proteger las infraestructuras tecnológicas y de comunicación que soportan la operación de una organización.",
+                options: ["Falso", "Verdadero"],
+                answer: 0,
+                category: "Seguridad"
             },
             {
-                question: "¿Qué dirección ip se utiliza por defecto en los routers inalámbricos?",
-                options: [
-                    "192.168.0.1",
-                    "192.168.10.1",
-                    "192.168.1.1",
-                    "192.168.0.0"
-                ],
-                correctOption: 0,
-                explanation: "192.168.0.1 y 192.168.1.1 son direcciones comunes en routers."
+                question: "Todo sistema informático esta expuesto al peligro por medio de tres factores:",
+                options: ["Amenazas, Vulnerabilidades y Ataques", "Hardware, Software y Peopleware", "Virus, Gusanos y Troyanos", "Físico, Lógico y Administrativo"],
+                answer: 0,
+                category: "Seguridad"
             },
             {
-                question: "Como se denomina a la persona con elevados conocimientos de sistemas y seguridad informática.",
-                options: [
-                    "Administrador de red",
-                    "Usuario",
-                    "Hacker",
-                    "Programador"
-                ],
-                correctOption: 2,
-                explanation: "Un hacker tiene conocimientos que puede emplear en beneficio propio y de la comunidad."
+                question: "Como se denomina a probabilidad de que una amenaza se materialice, utilizando vulnerabilidades existentes de un activo o un grupo de activos, generándole perdidas o daños dentro de un sistema.",
+                options: ["Riesgo tecnológico", "Amenaza crítica", "Vulnerabilidad sistémica", "Impacto operacional"],
+                answer: 0,
+                category: "Seguridad"
             },
             {
-                question: "Las redes inalámbricas no son susceptibles a la interferencia.",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 1,
-                explanation: "Las redes inalámbricas son susceptibles a interferencias de otras señales."
+                question: "La red 10.0.0.0/16 ha sido dividida con una máscara de subred 255.255.192.0 para todas las subredes. ¿Cuántos hosts posibles hay en cada subred?",
+                options: ["16382 hosts", "16384 hosts", "32766 hosts", "4094 hosts"],
+                answer: 0,
+                category: "Redes"
             },
             {
-                question: "Las redes WIfi 802.11 utilizan canales para su transmisión, en el caso de 2.4 ghz. ¿cuántos canales utiliza?",
-                options: [
-                    "11",
-                    "13",
-                    "14",
-                    "16"
-                ],
-                correctOption: 0,
-                explanation: "En la banda de 2.4 GHz se utilizan 11 canales."
+                question: "Los siguientes comandos: S1# configura terminal, S1(config)# vlan 20, S1(config-vlan)# name Estudiantes, S1(config-vlan)# End sirven para:",
+                options: ["Asignar puertos de un switch", "Crear una Vlan", "Configurar rangos de puertos de un switch", "Asignar una Vlan de voz"],
+                answer: 1,
+                category: "Redes"
             },
             {
-                question: "¿Qué modo de seguridad es el más completo en redes inalámbricas?",
-                options: [
-                    "WEP abierto",
-                    "WPA (PSK)",
-                    "WPA2 (PSK2)",
-                    "TKIP"
-                ],
-                correctOption: 2,
-                explanation: "WPA2 (PSK2) ofrece las mejores funciones de encriptación y autenticación."
+                question: "¿Qué protocolo tiene el tiempo de convergencia mas largo?",
+                options: ["OSPF", "RIP", "EIGRP", "Todos"],
+                answer: 1,
+                category: "Protocolos"
             },
             {
-                question: "El estándar WLAN, permite la transmisión de información a través de diferentes medios.",
-                options: [
-                    "Fibra óptica",
-                    "Luz infrarroja",
-                    "Par trenzado",
-                    "Cable coaxial"
-                ],
-                correctOption: 1,
-                explanation: "WLAN puede utilizar luz infrarroja para la transmisión."
+                question: "¿Cuáles son las dos afirmaciones verdaderas con respecto al modo EXEC del usuario?",
+                options: ["Todos los comandos del router están disponibles.", "La petición de entrada del dispositivo para este modo termina con el símbolo '>'.", "Solo se pueden ver algunos aspectos de la configuración del router.", "Se pueden configurar interfaces y protocolos de routing.", "Se puede acceder al modo de configuración global introduciendo el comando enable."],
+                answer: 2,
+                category: "Redes",
+                multiAnswer: [1, 2] // La petición termina con > y solo se pueden ver algunos aspectos
             },
             {
-                question: "¿Cómo se denomina la topología inalámbrica que permite la conexión sin punto de acceso?",
-                options: [
-                    "EBSS",
-                    "Ad-Hoc",
-                    "Roaming",
-                    "Fullmesh"
-                ],
-                correctOption: 1,
-                explanation: "La topología Ad-Hoc permite conexiones directas entre dispositivos."
+                question: "Los cables cruzados se emplean para conectar",
+                options: ["Dos routers", "Dos computadoras", "Computadoras a switch", "De switch a router"],
+                answer: 1,
+                category: "Redes"
             },
             {
-                question: "¿Cuál de los siguientes componentes están integrados en un router doméstico inalámbrico?",
-                options: [
-                    "Switch",
-                    "Router",
-                    "Antena",
-                    "Punto de Acceso (AP)",
-                    "Extensor de red"
-                ],
-                correctOption: 0,
-                explanation: "Los routers domésticos suelen incluir switch, router y punto de acceso."
+                question: "Protocolo mediante el cual un servidor asigna dinámicamente una dirección IP y otros parámetros de configuración de red a cada dispositivo en una red para que puedan comunicarse con otras redes IP.",
+                options: ["HTTP", "UTP", "TCP", "DHCP"],
+                answer: 3,
+                category: "Protocolos"
             },
             {
-                question: "Las redes Wifi pueden operar en dos bandas, seleccione las que corresponden.",
-                options: [
-                    "850 Mhz",
-                    "2.4 Ghz",
-                    "1.7 Ghz",
-                    "5 Ghz"
-                ],
-                correctOption: 1,
-                explanation: "Las redes WiFi operan en las bandas de 2.4 GHz y 5 GHz."
+                question: "Es un ejemplo de una dirección IP clase A",
+                options: ["192.168.1.0", "223.10.5.23", "10.4.5.0", "Ninguna de las anteriores"],
+                answer: 2,
+                category: "Direccionamiento"
             },
             {
-                question: "¿A qué tecnología pertenece WIFI-6G?",
-                options: [
-                    "802.11ad",
-                    "802.11ac",
-                    "802.11ax",
-                    "802.11n"
-                ],
-                correctOption: 2,
-                explanation: "WiFi-6G corresponde al estándar 802.11ax."
+                question: "Cómo se denomina al proceso en el que el administrador de la red debe encargarse de configurar manualmente cada uno de los routers para que reconozca toda la red.",
+                options: ["Tabla de Enrutamiento", "Enrutamiento Estatico", "Enrutamiento Dinámico", "RIP"],
+                answer: 1,
+                category: "Redes"
+            },
+            {
+                question: "Una dirección IP es",
+                options: ["Un número que identifica a un dispositivo dentro de una red", "Un número que nunca cambia entre redes", "Un número que se expresa en formato hexadecimal", "Un número que solo identifica servidores"],
+                answer: 0,
+                category: "Direccionamiento"
+            },
+            {
+                question: "Es esta capa se presentan problemas de cableado, conexiones, energía, etc.",
+                options: ["Capa Física", "Capa de Presentación", "Capa de Sesión", "Capa de Red"],
+                answer: 0,
+                category: "Modelo OSI"
+            },
+            {
+                question: "La Mascara por defecto de las direcciones clase B es:",
+                options: ["255.0.0.0", "255.255.0.0", "255.255.255.0", "255.255.255.255"],
+                answer: 1,
+                category: "Direccionamiento"
+            },
+            {
+                question: "Si se tiene las subred 10.1.1.0/28. ¿Cuál es la máscara de subred?",
+                options: ["255.255.255.240", "255.255.240.0", "255.255.255.252", "255.255.255.248"],
+                answer: 0,
+                category: "Direccionamiento"
+            },
+            {
+                question: "Topología que cuenta con un solo cable compartido",
+                options: ["BUS", "STAR", "RING", "MESH", "HYBRID"],
+                answer: 0,
+                category: "Topologías"
+            },
+            {
+                question: "La Dirección IP 193.23.58.12.0 hace parte del rango de las clases:",
+                options: ["A", "B", "C", "D"],
+                answer: 1,
+                category: "Direccionamiento"
+            },
+            {
+                question: "Los switches son dispositivos de capa",
+                options: ["1", "2", "3", "4"],
+                answer: 1,
+                category: "Dispositivos de Red"
+            },
+            {
+                question: "¿Cuál de las siguientes clases son las que permite tener redes con mayor cantidad de host?",
+                options: ["Clase A", "Clase B", "Clase C", "Clase D"],
+                answer: 0,
+                category: "Direccionamiento"
+            },
+            {
+                question: "Formato CIDR de la máscara de subred 255.0.0.0",
+                options: ["/8", "/10", "/16", "/20"],
+                answer: 0,
+                category: "Direccionamiento"
+            },
+            {
+                question: "¿Qué dispositivo permite la conexión entre subredes diferentes?",
+                options: ["Router", "Hub", "Switch", "Modem"],
+                answer: 0,
+                category: "Dispositivos de Red"
+            },
+            {
+                question: "Se basa en la utilización o empleo de protocolos de enrutamiento con el fin de automatizar el intercambio y la actualización de las tablas de enrutamiento de cada uno de los routers",
+                options: ["Enrutamiento Estático", "Enrutamiento Dinámico", "Rutas", "Tabla de Ruteo"],
+                answer: 1,
+                category: "Redes"
+            },
+            {
+                question: "Si se requiere de dividir en 10 subredes la red 192.168.1.0/24. ¿Cuántos bits debemos pedir prestados a la porción de host?",
+                options: ["4 bits", "5 bits", "6 bits", "8 bits"],
+                answer: 0,
+                category: "Direccionamiento"
+            },
+            {
+                question: "Si una subred debe tener 60 hosts. ¿Cuántos bits debemos usar para la porción de hosts?",
+                options: ["4 bits", "5 bits", "6 bits", "8 bits"],
+                answer: 2,
+                category: "Direccionamiento"
+            },
+            {
+                question: "Es un protocolo de vector distancia que utiliza el conteo de saltos como su métrica principal",
+                options: ["EIGRP", "RIP", "MAC", "IP"],
+                answer: 1,
+                category: "Protocolos"
+            },
+            {
+                question: "Las VLAN de datos se usan para dividir la red en grupos de usuarios o dispositivos.",
+                options: ["FALSO", "VERDADERO"],
+                answer: 1,
+                category: "Redes"
+            },
+            {
+                question: "¿De cuántos bits se compone una dirección IPv4?",
+                options: ["32 bits", "8 bits", "3 Octetos", "255 bits"],
+                answer: 0,
+                category: "Direccionamiento"
+            },
+            {
+                question: "Formato CIDR de la máscara de subred 255.255.255.252",
+                options: ["/30", "/31", "/32", "/28"],
+                answer: 0,
+                category: "Direccionamiento"
+            },
+            {
+                question: "La ip 172.16.0.1 pertenece a la clase",
+                options: ["A", "B", "C", "D"],
+                answer: 1,
+                category: "Direccionamiento"
+            },
+            {
+                question: "RIP permite solo ___ saltos en una ruta",
+                options: ["11", "15", "12", "21"],
+                answer: 1,
+                category: "Protocolos"
+            },
+            {
+                question: "Formato estándar de la máscara de subred /16",
+                options: ["255.0.0.0", "255.255.0.0", "255.255.255.0", "No es correcta"],
+                answer: 1,
+                category: "Direccionamiento"
+            },
+            {
+                question: "Un octeto de una ip en versión 4 tiene……",
+                options: ["4 bits", "8 bits", "16 bits", "32 bits"],
+                answer: 1,
+                category: "Direccionamiento"
+            },
+            {
+                question: "¿Cuántas capas tiene el modelo OSI?",
+                options: ["8", "7", "6", "5"],
+                answer: 1,
+                category: "Modelo OSI"
+            },
+            {
+                question: "¿Qué protocolo es propietario?",
+                options: ["Ninguno", "Todos", "OSPF", "EIGRP", "RIP"],
+                answer: 3,
+                category: "Protocolos"
+            },
+            {
+                question: "Dispositivo capa 3:",
+                options: ["Router", "MAC", "Cable Coaxial", "Switch"],
+                answer: 0,
+                category: "Dispositivos de Red"
+            },
+            {
+                question: "Según su cobertura las redes se clasifican en …",
+                options: ["Bus-Anillo-Estrella", "LAN-MAN-WAN", "Cliente Servidor, igual-a-igual", "Todas las anteriores"],
+                answer: 1,
+                category: "Redes"
+            },
+            {
+                question: "¿Qué dirección ip se utiliza por defecto en los routers inalámbricos? (Elige 2 opciones)",
+                options: ["192.168.0.1", "192.168.10.1", "192.168.1.1", "192.168.0.0"],
+                answer: 0,
+                category: "Redes",
+                multiAnswer: [0, 2] // 192.168.0.1 y 192.168.1.1
+            },
+            {
+                question: "Como se denomina a la persona con elevados conocimientos de sistemas y seguridad informática, los cuales puede emplear en beneficio propio y de la comunidad.",
+                options: ["Administrador de red", "Usuario", "Hacker", "Programador"],
+                answer: 2,
+                category: "Tipos de Hackers"
+            },
+            {
+                question: "Las redes inalámbricas no son susceptibles a la interferencia, ya sea de otras señales en el mismo canal de emisión o de ruidos continuos de baja frecuencia, antenas, aparatos de microondas o incluso de cierto tipo de metales.",
+                options: ["Verdadero", "Falso"],
+                answer: 1,
+                category: "Redes Inalámbricas"
+            },
+            {
+                question: "Las redes WIFI 802.11 utilizan canales para su transmisión, en el caso de 2.4 ghz. ¿cuántos canales utiliza?",
+                options: ["11", "13", "14", "16"],
+                answer: 0,
+                category: "Redes Inalámbricas"
+            },
+            {
+                question: "¿Qué modo de seguridad es el más completo en cuanto a las funciones de encriptación y autenticación en redes inalámbricas?",
+                options: ["WEP abierto", "WPA (PSK)", "WPA2 (PSK2)", "TKIP"],
+                answer: 2,
+                category: "Seguridad"
+            },
+            {
+                question: "El estándar WLAN, permite la transmisión de información a través de diferentes medios. Elige uno de ellos.",
+                options: ["Fibra óptica", "Luz infrarroja", "Par trenzado", "Cable coaxial"],
+                answer: 1,
+                category: "Redes Inalámbricas"
+            },
+            {
+                question: "¿Cómo se denomina la topología inalámbrica que permite la conexión de dispositivos sin el uso de un punto de acceso?",
+                options: ["EBSS", "Ad-Hoc", "Roaming", "Fullmesh"],
+                answer: 1,
+                category: "Redes Inalámbricas"
+            },
+            {
+                question: "¿Cuál de los siguientes componentes están integrados en un router doméstico inalámbrico? (Escoja tres opciones).",
+                options: ["Switch", "Router", "Antena", "Punto de Acceso (AP)", "Extensor de red"],
+                answer: 0,
+                category: "Dispositivos de Red",
+                multiAnswer: [0, 1, 3] // Switch, Router, Punto de Acceso
+            },
+            {
+                question: "Las redes WiFi pueden operar en dos bandas, seleccione las que corresponden.",
+                options: ["850 Mhz", "2.4 Ghz", "1.7 Ghz", "5 Ghz"],
+                answer: 1,
+                category: "Redes Inalámbricas",
+                multiAnswer: [1, 3] // 2.4 Ghz y 5 Ghz
+            },
+            {
+                question: "¿A qué tecnología pertenece WIFI-6?",
+                options: ["802.11ad", "802.11ac", "802.11ax", "802.11n"],
+                answer: 2,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "¿Cuál de los siguientes no es un estándar IEEE 802.11?",
-                options: [
-                    "802.11a/b",
-                    "802.11ac",
-                    "802.11z"
-                ],
-                correctOption: 2,
-                explanation: "802.11z no es un estándar IEEE 802.11 válido."
+                options: ["802.11 a/b", "802.11 ac", "802.11 z"],
+                answer: 2,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "¿Una red WLAN es?",
-                options: [
-                    "Una red de área local inalámbrica.",
-                    "Una red de área metropolitana inalámbrica",
-                    "Una red de área personal inalámbrica",
-                    "Una red de área amplia inalámbrica"
-                ],
-                correctOption: 0,
-                explanation: "WLAN significa Wireless Local Area Network (red de área local inalámbrica)."
+                options: ["Una red de área local inalámbrica", "Una red de área metropolitana inalámbrica", "Una red de área personal inalámbrica", "Una red de área amplia inalámbrica"],
+                answer: 0,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "¿802.11a también se le conoce cómo?",
-                options: [
-                    "WI-Fi 1",
-                    "WI-Fi 2",
-                    "WI-Fi 5",
-                    "WI-Fi 4"
-                ],
-                correctOption: 1,
-                explanation: "802.11a se conoce como Wi-Fi 2."
+                options: ["WI-Fi 1", "WI-Fi 2", "WI-Fi 5", "WI-Fi 4"],
+                answer: 2,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "¿Cuál es la sigla de red inalámbrica de área metropolitana?",
-                options: [
-                    "WPAN",
-                    "WLAN",
-                    "WMAV",
-                    "WMAN"
-                ],
-                correctOption: 3,
-                explanation: "WMAN significa Wireless Metropolitan Area Network."
+                options: ["WPAN", "WLAN", "WMAV", "WMAN"],
+                answer: 3,
+                category: "Redes Inalámbricas"
             },
             {
-                question: "Conecta los dispositivos ubicados cerca del usuario, normalmente mediante bluetooth.",
-                options: [
-                    "WLAN",
-                    "WPAN",
-                    "WWAN",
-                    "WMAN"
-                ],
-                correctOption: 1,
-                explanation: "WPAN (Wireless Personal Area Network) conecta dispositivos cercanos."
+                question: "Conecta los dispositivos ubicados cerca del usuario, normalmente mediante bluetooth",
+                options: ["WLAN", "WPAN", "WWAN", "WMAN"],
+                answer: 1,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "¿Cuál de las siguientes afirmaciones describe una ventaja de trabajar con una banda de 2.4 GHz?",
-                options: [
-                    "El índice de absorción de obstáculos como paredes es menor que el de 5GHz.",
-                    "Existen menos dispositivos comerciales en esta banda de frecuencia.",
-                    "Tiene un menor alcance.",
-                    "No requiere del uso de tarjetas de red."
-                ],
-                correctOption: 0,
-                explanation: "La banda de 2.4 GHz tiene mejor penetración de obstáculos que la de 5 GHz."
+                options: ["El índice de absorción de obstáculos como paredes es menor que el de 5GHz.", "Existen menos dispositivos comerciales en esta banda de frecuencia, lo que lo hace menos susceptible a interferencias.", "Tiene un menor alcance.", "No requiere del uso de tarjetas de red."],
+                answer: 0,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "Una de las tres organizaciones que influyen en los estándares de WLAN en el mundo es...",
-                options: [
-                    "ISO",
-                    "OSI",
-                    "WIFI ALLIANCE",
-                    "IEEI"
-                ],
-                correctOption: 2,
-                explanation: "Wi-Fi Alliance es una organización clave en estándares WLAN."
+                options: ["ISO", "OSI", "WIFI ALLIANCE", "IEEE"],
+                answer: 3,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "Elige los tipos de Redes que NO son Inalámbricas.",
-                options: [
-                    "WLAN",
-                    "WPAN",
-                    "WMAN",
-                    "PAN, LAN, MAN"
-                ],
-                correctOption: 3,
-                explanation: "PAN, LAN y MAN pueden ser redes cableadas, no necesariamente inalámbricas."
+                options: ["WLAN", "WPAN", "WMAN", "PAN, LAN, MAN"],
+                answer: 3,
+                category: "Redes"
             },
             {
                 question: "¿Cuál de las siguientes es una ventaja importante de las redes inalámbricas frente a las cableadas?",
-                options: [
-                    "Movilidad",
-                    "Velocidad de transmisión",
-                    "Alcance",
-                    "Seguridad"
-                ],
-                correctOption: 0,
-                explanation: "La movilidad es una ventaja clave de las redes inalámbricas."
+                options: ["Movilidad", "Velocidad de transmisión", "Alcance", "Seguridad"],
+                answer: 0,
+                category: "Redes Inalámbricas"
             },
             {
-                question: "Cuál de las siguientes proposiciones se considera una desventaja de las redes inalámbricas:",
-                options: [
-                    "Su instalación resulta mucho más rápida y económica.",
-                    "Permite una comunicación más ágil.",
-                    "Permite multiplicidad de conexiones.",
-                    "Existe un mayor riesgo para la seguridad de las personas."
-                ],
-                correctOption: 3,
-                explanation: "La seguridad es una preocupación mayor en redes inalámbricas."
+                question: "Cual de las siguientes proposiciones se considera una desventaja de las redes inalámbricas:",
+                options: ["Su instalación resulta mucho más rápida y económica que las redes alámbricas - cableadas, logrando un ahorro en materiales.", "Permite una comunicación más ágil.", "Permite multiplicidad de conexiones, dado que a una misma señal puede adherirse más de un aparato simultáneamente.", "Existe un mayor riesgo para la seguridad de las personas que hacen uso de la red."],
+                answer: 3,
+                category: "Redes Inalámbricas"
             },
             {
-                question: "¿Cual tiene mayor Alcance?",
-                options: [
-                    "Wifi",
-                    "Bluetooth"
-                ],
-                correctOption: 0,
-                explanation: "WiFi tiene mayor alcance que Bluetooth."
+                question: "Cual tiene mayor Alcance",
+                options: ["Wifi", "Bluetooth"],
+                answer: 0,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "Esta red ofrece una cobertura mas extensa que todas las demás redes inalámbricas.",
-                options: [
-                    "Wireless Wide Area Network - (WWAN)",
-                    "Wireless Metropolitan Area Network - (WMAN)",
-                    "Wireless Local Area Network - (WLAN)",
-                    "Wireless personal Area Network - (WPAN)"
-                ],
-                correctOption: 0,
-                explanation: "WWAN ofrece la cobertura más extensa."
+                options: ["Wireless Wide Area Network - (WWAN)", "Wireless Metropolitan Area Network - (WMAN)", "Wireless Local Area Network - (WLAN)", "Wireless personal Area Network - (WPAN)"],
+                answer: 0,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "La red WiMAX es considera una red inalámbrica de tipo:",
-                options: [
-                    "WMAN",
-                    "WWAN",
-                    "WPAN",
-                    "WLAN"
-                ],
-                correctOption: 0,
-                explanation: "WiMAX es una tecnología WMAN (Wireless Metropolitan Area Network)."
+                options: ["WMAN", "WWAN", "WPAN", "WLAN"],
+                answer: 0,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "Elige el estándar de una red WLAN",
-                options: [
-                    "802.3",
-                    "802.11",
-                    "802.20",
-                    "802.15"
-                ],
-                correctOption: 1,
-                explanation: "802.11 es el estándar para redes WLAN."
+                options: ["802.3", "802.11", "802.20", "802.15"],
+                answer: 1,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "Surgió para solucionar los problemas de seguridad que ofrecía el sistema WEP",
-                options: [
-                    "WPA",
-                    "WEP2",
-                    "WLAN",
-                    "VLSM"
-                ],
-                correctOption: 0,
-                explanation: "WPA surgió para solucionar los problemas de seguridad de WEP."
+                options: ["WPA", "WEP2", "WLAN", "VLSM"],
+                answer: 0,
+                category: "Seguridad"
             },
             {
-                question: "Tipo de red inalámbrica que emplea tecnologías de telefonía celular y microondas.",
-                options: [
-                    "WWAN",
-                    "WMAN",
-                    "WLAN",
-                    "WPAN"
-                ],
-                correctOption: 0,
-                explanation: "WWAN utiliza tecnologías de telefonía celular para grandes distancias."
+                question: "Tipo de red inalámbrica que emplea tecnologías de telefonía celular y microondas para transferir datos a lo largo de enormes distancias.",
+                options: ["WWAN", "WMAN", "WLAN", "WPAN"],
+                answer: 0,
+                category: "Redes Inalámbricas"
             },
             {
-                question: "Soluciona los problemas de vulnerabilidad detectados en la primera versión.",
-                options: [
-                    "WAP2",
-                    "WPA2",
-                    "WBA2",
-                    "WXA2"
-                ],
-                correctOption: 1,
-                explanation: "WPA2 soluciona los problemas de vulnerabilidad de WPA."
+                question: "Soluciona los problemas de vulnerabilidad detectados en la primera versión e incorpora todas las características del estándar IEEE 802.11",
+                options: ["WAP2", "WPA2", "WBA2", "WXA2"],
+                answer: 1,
+                category: "Seguridad"
             },
             {
                 question: "¿Cuáles de las siguientes opciones es una topología WLAN?",
-                options: [
-                    "Estrella extendida",
-                    "Roaming",
-                    "Fullmesh",
-                    "Infraestructura (BSS)"
-                ],
-                correctOption: 3,
-                explanation: "Infraestructura (BSS) es una topología WLAN común."
+                options: ["Estrella extendida", "Roaming", "Fullmesh", "Infraestructura (BSS)"],
+                answer: 3,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "¿Cómo se identifica una red inalámbrica de otras?",
-                options: [
-                    "Estableciendo el modo de seguridad",
-                    "Estableciendo el SSID",
-                    "Estableciendo un canal estándar",
-                    "Por su dirección de red"
-                ],
-                correctOption: 1,
-                explanation: "El SSID identifica una red inalámbrica."
+                options: ["Estableciendo el modo de seguridad", "Estableciendo el SSID", "Estableciendo un canal estándar", "Por su dirección de red"],
+                answer: 1,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "Amenazas WLAN",
-                options: [
-                    "Ataque Denial of Service",
-                    "Ataque 2",
-                    "malware",
-                    "No lo sé Rick, no estoy convencido de mi respuesta"
-                ],
-                correctOption: 0,
-                explanation: "Los ataques de Denegación de Servicio (DoS) son una amenaza común en WLAN."
+                options: ["Ataque Denial of Service", "Ataque 2", "malware", "No lo sé Rick, no estoy convencido de mi respuesta"],
+                answer: 0,
+                category: "Seguridad"
             },
             {
-                question: "¿Qué método de acceso sería más apropiado para configurar un nuevo switch?",
-                options: [
-                    "Consola",
-                    "Telnet",
-                    "Aux",
-                    "SSH"
-                ],
-                correctOption: 0,
-                explanation: "La conexión por consola es la más apropiada para configurar un nuevo switch."
+                question: "¿Qué método de acceso sería más apropiado si estuviera en la sala de equipos con un nuevo switch que necesita ser configurado?",
+                options: ["Consola", "Telnet", "Aux", "SSH"],
+                answer: 0,
+                category: "Redes"
             },
             {
-                question: "Los siguientes comandos sirven para: (configuración de interfaz y VLAN)",
-                options: [
-                    "Crear una Vlan",
-                    "Crear una red Vlan Troncal",
-                    "Asignar puertos a una VLan",
-                    "Configurar una Vlan de voz"
-                ],
-                correctOption: 2,
-                explanation: "Estos comandos asignan puertos a una VLAN específica."
+                question: "Los siguientes comandos: SI# configure terminal, SI(config)# interface fa0/6, SI(config-if)# switchport mode access, SI(config-if)# switchport access vlan 20, SI(config-if)# end Sirven para:",
+                options: ["Crear una Vlan", "Crear una red Vlan Troncal", "Asignar puertos a una VLan", "Configurar una Vlan de voz"],
+                answer: 2,
+                category: "Redes"
             },
             {
                 question: "En un switch con varias VLAN, ¿qué comando elimina solo la VLAN 100 del switch?",
-                options: [
-                    "Switch# delete flash:vlan.dat",
-                    "Switch(config-if)# no switchport access vlan 100",
-                    "Switch(config-if)# no switchport trunk allowed vlan 100",
-                    "Switch(config)# no vlan 100"
-                ],
-                correctOption: 3,
-                explanation: "El comando 'no vlan 100' en modo configuración global elimina la VLAN 100."
+                options: ["Switch# delete flash:vlan.dat", "Switch(config-if)# no switchport access vlan 100", "Switch(config-if)# no switchport trunk allowed vlan 100", "Switch(config)# no vlan 100"],
+                answer: 3,
+                category: "Redes"
             },
             {
-                question: "¿Cuáles son los tres principales beneficios de usar redes VLAN?",
-                options: [
-                    "Reducción de costos",
-                    "Llegar a mas usuarios",
-                    "Mejorar la seguridad",
-                    "Aumentar el tráfico",
-                    "Mejorar el rendimiento al reducir el broadcast"
-                ],
-                correctOption: 0,
-                explanation: "Los beneficios principales de VLAN son: reducción de costos, mejorar seguridad y mejorar rendimiento."
+                question: "¿Cuáles son los tres principales beneficios de usar redes VLAN? (Elija tres opciones).",
+                options: ["Reducción de costos", "Llegar a mas usuarios", "Mejorar la seguridad", "Aumentar el tráfico", "Mejorar el rendimiento al reducir el broadcast"],
+                answer: 0,
+                category: "Redes",
+                multiAnswer: [0, 2, 4] // Reducción de costos, Mejorar la seguridad, Mejorar el rendimiento
             },
             {
                 question: "Indique el comando que permite ingresar al modo de configuración global:",
-                options: [
-                    "Enable",
-                    "Configure terminal",
-                    "No shutdown",
-                    "Show ip route"
-                ],
-                correctOption: 1,
-                explanation: "El comando 'configure terminal' ingresa al modo de configuración global."
+                options: ["Enable", "Configure terminal", "No shutdown", "Show ip route"],
+                answer: 1,
+                category: "Redes"
             },
             {
-                question: "Los comandos (interface, switchport mode trunk) sirven para:",
-                options: [
-                    "Crear una VLAN",
-                    "Configurar puertos de enlace troncal",
-                    "Configurar los puertos de administración",
-                    "Configurar una Vlan de Voz"
-                ],
-                correctOption: 1,
-                explanation: "Estos comandos configuran puertos como enlaces troncales para VLANs."
+                question: "Los comandos SI(config)# interface fa0/1, SI(config-if)# switchport mode trunk, SI(config-if)# no shut, SI(config-if)# exit Sirven para:",
+                options: ["Crear una VLAN", "Configurar puertos de enlace troncal", "Configurar los puertos de administración", "Configurar una Vlan de Voz"],
+                answer: 1,
+                category: "Redes"
             },
             {
                 question: "¿En qué modo IOS se encuentra si el prompt muestra: Switch(config)#?",
-                options: [
-                    "Modo de configuración global",
-                    "Modo de subconfiguración de la interfaz",
-                    "Modo de subconfiguración de la línea de consola",
-                    "Modo EXEC privilegiado",
-                    "Modo EXEC de usuario"
-                ],
-                correctOption: 0,
-                explanation: "El prompt Switch(config)# indica modo de configuración global."
+                options: ["Modo de configuración global", "Modo de subconfiguración de la interfaz", "Modo de subconfiguración de la línea de consola", "Modo EXEC privilegiado", "Modo EXEC de usuario"],
+                answer: 0,
+                category: "Redes"
             },
             {
                 question: "¿Qué protocolo utilizan los Switches para crear enlaces troncales VLAN entre ellos?",
-                options: [
-                    "IEEE 802.11b",
-                    "IEEE 802.1q",
-                    "IEEE 802.3a",
-                    "IEEE 802.2q"
-                ],
-                correctOption: 1,
-                explanation: "IEEE 802.1q es el protocolo para enlaces troncales VLAN."
+                options: ["IEEE 802.11b", "IEEE 802.1q", "IEEE 802.3a", "IEEE 802.2q"],
+                answer: 1,
+                category: "Protocolos"
             },
             {
-                question: "¿Qué método de acceso sería el acceso remoto más apropiado al IOS a través de una conexión de red?",
-                options: [
-                    "Consola",
-                    "Telnet",
-                    "SSH",
-                    "Aux"
-                ],
-                correctOption: 2,
-                explanation: "SSH es el método más seguro para acceso remoto."
+                question: "¿Qué método de acceso sería el acceso remoto más apropiado al IOS a través de una conexión de network?",
+                options: ["Consola", "Telnet", "SSH", "Aux"],
+                answer: 2,
+                category: "Redes"
             },
             {
-                question: "¿En qué modo IOS se encuentra si el prompt muestra switch>?",
-                options: [
-                    "Modo de configuración global",
-                    "Modo de subconfiguración de la interfaz",
-                    "Modo de subconfiguración de la línea de consola",
-                    "Modo EXEC privilegiado",
-                    "Modo EXEC de usuario"
-                ],
-                correctOption: 4,
-                explanation: "El prompt switch> indica modo EXEC de usuario."
+                question: "¿En qué modo IOS se encuentra si el prompt muestra switch?",
+                options: ["Modo de configuración global", "Modo de subconfiguración de la interfaz", "Modo de subconfiguración de la línea de consola", "Modo EXEC privilegiado", "Modo EXEC de usuario"],
+                answer: 4,
+                category: "Redes"
             },
             {
                 question: "Una VLAN es:",
-                options: [
-                    "Red de área local virtual.",
-                    "Red de área extensa",
-                    "Red de área local inalámbrica"
-                ],
-                correctOption: 0,
-                explanation: "VLAN significa Virtual Local Area Network."
+                options: ["Red de área local virtual", "Red de área extensa", "Red de área local inalámbrica"],
+                answer: 0,
+                category: "Redes"
             },
             {
-                question: "La VLAN predeterminada para los switches Cisco es la VLAN 1.",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 0,
-                explanation: "VLAN 1 es la VLAN predeterminada en switches Cisco."
+                question: "La VLAN predeterminada para los switches Cisco es la VLAN 1. Por lo tanto, todos los puertos del switch están en VLAN 1",
+                options: ["Verdadero", "Falso"],
+                answer: 0,
+                category: "Redes"
             },
             {
-                question: "Las redes inalámbricas no son susceptibles a la interferencia.",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 1,
-                explanation: "Las redes inalámbricas son susceptibles a interferencias."
+                question: "Las redes inalámbricas no son susceptibles a la interferencia, ya sea de otras señales en el mismo canal de emisión o de ruidos continuos de baja frecuencia, antenas, aparatos de microondas o incluso de cierto tipo de metales.",
+                options: ["Verdadero", "Falso"],
+                answer: 1,
+                category: "Redes Inalámbricas"
             },
             {
                 question: "¿Cuál es el protocolo base de VoIP establecido por la ITU-T?",
-                options: [
-                    "H.222",
-                    "H.323",
-                    "H.423",
-                    "SIP"
-                ],
-                correctOption: 1,
-                explanation: "H.323 es el protocolo base de VoIP establecido por ITU-T."
+                options: ["H.222", "H.323", "H.423", "STP"],
+                answer: 1,
+                category: "Protocolos"
             },
             {
                 question: "¿Cuántos hextetos conforman una dirección IPv6?",
-                options: [
-                    "12",
-                    "8",
-                    "10",
-                    "6"
-                ],
-                correctOption: 1,
-                explanation: "Una dirección IPv6 tiene 8 hextetos de 16 bits cada uno."
+                options: ["12", "8", "10", "6"],
+                answer: 1,
+                category: "Direccionamiento"
             },
             {
                 question: "¿Cuál NO es una dirección IPv6?",
-                options: [
-                    "fe80::1::1234",
-                    "1::",
-                    "abcd:abcd::123:4567:89ab:cdef",
-                    "aaaa:b::c"
-                ],
-                correctOption: 0,
-                explanation: "fe80::1::1234 no es una dirección IPv6 válida (doble ::)."
+                options: ["fe80::1::1234", "i::", "abcd:abcd::123:4567:89ab:cdef", "aaaa:bi:c"],
+                answer: 0,
+                category: "Direccionamiento"
             },
             {
                 question: "¿Qué ofrecen los proveedores mediante el servicio SaaS?",
-                options: [
-                    "ofrecen hardware virtual",
-                    "Ofrecen una variedad de aplicaciones empresariales"
-                ],
-                correctOption: 1,
-                explanation: "SaaS ofrece aplicaciones empresariales accesibles through internet."
+                options: ["ofrecen hardware virtual, desde configuraciones básicas hasta sistemas de gran eficiencia y complejidad", "Ofrecen una variedad de aplicaciones empresariales, a las cuales se accede a través de internet y desde cualquier dispositivo"],
+                answer: 1,
+                category: "Servicios en la Nube"
+            },
+            {
+                question: "De acuerdo a la configuración realizada en el Router A, ¿Qué tipo de ruta estática se utilizó? ipv6 route 2001:ABC::/32 2001:ABC:1111:2222:1",
+                options: ["Ruta estática con ip del siguiente salto", "Ruta estática con interfaz de salida", "Ruta estática completamente especificada", "Ruta estática predeterminada"],
+                answer: 0,
+                category: "Redes"
+            },
+            {
+                question: "Seleccione los 3 direccionamientos de IPv6",
+                options: ["Anycast - Unicast - Multicast", "Broadcast - Unicast - Multicast", "Anycast - Broadcast - Multicast", "Unicast - Multicast - Broadcast"],
+                answer: 0,
+                category: "Direccionamiento"
+            },
+            {
+                question: "Es el que separa los recursos físicos de los entornos virtuales que los necesitan",
+                options: ["Hipervisor", "Saac", "Hardware", "Software"],
+                answer: 0,
+                category: "Virtualización"
             },
             {
                 question: "VoIP es la tecnología que permite comunicar voz sobre el protocolo IP.",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 0,
-                explanation: "VoIP significa Voz sobre Protocolo de Internet."
+                options: ["Verdadero", "Falso"],
+                answer: 0,
+                category: "Protocolos"
             },
             {
                 question: "En Bolivia aún no se está utilizando IPv6",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 1,
-                explanation: "IPv6 se está implementando gradualmente en todo el mundo, incluido Bolivia."
+                options: ["Verdadero", "Falso"],
+                answer: 1,
+                category: "Direccionamiento"
             },
             {
                 question: "¿Qué tipos de servicios se ofrecen en la nube?",
-                options: [
-                    "SaaS, PaaS e IaaS",
-                    "Solo SaaS",
-                    "Solo IaaS",
-                    "Solo PaaS"
-                ],
-                correctOption: 0,
-                explanation: "Los principales servicios en la nube son SaaS, PaaS e IaaS."
+                options: ["SaaS, PaaS e TaaS", "SaaS, PaaS e IaaS", "PaaS, IaaS e TaaS", "SaaS, IaaS e TaaS"],
+                answer: 1,
+                category: "Servicios en la Nube"
             },
             {
-                question: "Es una característica de IPV4?",
-                options: [
-                    "Tiene 30 bits",
-                    "Tiene 32 bits"
-                ],
-                correctOption: 1,
-                explanation: "IPv4 tiene direcciones de 32 bits."
+                question: "Es una característica de IPv4?",
+                options: ["Tiene 30 bits", "Tiene 32 bits", "Tiene 64 bits", "Tiene 128 bits"],
+                answer: 1,
+                category: "Direccionamiento"
+            },
+            {
+                question: "¿Qué comando se debe configurar en R1 para incorporar la ruta a la subred 2001:0DB8::ACAD:4::/64? Utilizar la Ip del siguiente salto.",
+                options: ["ipv6 route 2001:0DB8::ACAD:4::/64 2001:0DB8::ACAD:3::2", "ip route 2001:0DB8::ACAD:4::/64 2001:0DB8::ACAD:3::2", "ipv6 route 2001:0DB8::ACAD:4::/64 gigabitethernet0/0", "ip route 2001:0DB8::ACAD:4::/64 gigabitethernet0/0"],
+                answer: 0,
+                category: "Redes"
             },
             {
                 question: "Una dirección IPv6 tiene 32 dígitos hexadecimales.",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 0,
-                explanation: "IPv6 tiene 128 bits, que equivalen a 32 dígitos hexadecimales."
+                options: ["Verdadero", "Falso"],
+                answer: 1,
+                category: "Direccionamiento"
             },
             {
-                question: "Simplifica la dirección IPv6: 2001:0000:0000:abcd:0000:0000:0000:0001",
-                options: [
-                    "2001:0:0:ABCD::1",
-                    "2001::ABCD:0:0:0:1",
-                    "2001:0:0:ABCD:0:0:0:1",
-                    "2001::ABCD::1"
-                ],
-                correctOption: 0,
-                explanation: "La forma correctamente simplificada es 2001:0:0:ABCD::1."
+                question: "Simplifica la dirección IPv6 utilizando el formato comprimido. 2001:0000:0000:abcd:0000:0000:0000:0001",
+                options: ["2001:0:0:ABCD::1", "2001::ABCD:0:0:0:1", "2001:0:0:ABCD:0:0:0:1", "2001::ABCD::1"],
+                answer: 0,
+                category: "Direccionamiento"
             },
             {
                 question: "Una desventaja de usar VoIP, es ser susceptible a virus, gusanos y hacking",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 0,
-                explanation: "VoIP es susceptible a amenazas de seguridad como virus y hacking."
+                options: ["Verdadero", "Falso"],
+                answer: 0,
+                category: "Protocolos"
             },
             {
-                question: "Una máquina virtual es...",
-                options: [
-                    "Hardware",
-                    "Software",
-                    "Firmware",
-                    "Ninguna de las anteriores"
-                ],
-                correctOption: 1,
-                explanation: "Una máquina virtual es software que emula hardware."
+                question: "Una máquina virtual es....",
+                options: ["Hardware", "Software", "Firmware", "Ninguna de las anteriores"],
+                answer: 1,
+                category: "Virtualización"
             },
             {
                 question: "Elige dos tipos de virtualización",
-                options: [
-                    "Virtualización de red",
-                    "Virtualización de datos",
-                    "Virtualización de información",
-                    "Virtualización de algoritmos"
-                ],
-                correctOption: 0,
-                explanation: "Virtualización de red y virtualización de datos son tipos comunes."
+                options: ["Virtualización de red", "Virtualización de datos", "Virtualización de información", "Virtualización de algoritmos"],
+                answer: 0,
+                category: "Virtualización",
+                multiAnswer: [0, 1] // Virtualización de red y Virtualización de datos
             },
             {
-                question: "El más utilizado. El software está alojado en servidores de los proveedores.",
-                options: [
-                    "El modelo PaaS -- Plataforma como Servicio",
-                    "El modelo SaaS- Software como Servicio de computación en la nube",
-                    "El modelo IaaS -- Infraestructura como Servicio"
-                ],
-                correctOption: 1,
-                explanation: "SaaS es el modelo donde el software está alojado en servidores del proveedor."
+                question: "El más utilizado. El software está alojado en servidores de los proveedores y el cliente accede a ellos a través del navegador web. este concepto pertenece a:",
+                options: ["El modelo PaaS - Plataforma como Servicio", "El modelo SaaS - Software como Servicio de computación en la nube", "El modelo IaaS - Infraestructura como Servicio"],
+                answer: 1,
+                category: "Servicios en la Nube"
             },
             {
                 question: "¿Cómo se denomina el protocolo base de VoIP establecido por la ITU-T?",
-                options: [
-                    "H.222",
-                    "H.323",
-                    "H.423",
-                    "SIP"
-                ],
-                correctOption: 1,
-                explanation: "H.323 es el protocolo base de VoIP establecido por ITU-T."
+                options: ["H.222", "H.323", "H.423", "SIP"],
+                answer: 1,
+                category: "Protocolos"
             },
             {
                 question: "La dos tecnologías que usa la virtualización de redes son:",
-                options: [
-                    "SDN",
-                    "NFV",
-                    "TCP/IP",
-                    "SAAC"
-                ],
-                correctOption: 0,
-                explanation: "SDN (Software Defined Networking) y NFV (Network Functions Virtualization)."
+                options: ["SDN", "NFV", "TCP/IP", "SAAC"],
+                answer: 0,
+                category: "Virtualización",
+                multiAnswer: [0, 1] // SDN y NFV
             },
             {
                 question: "¿Qué ofrecen los proveedores a través del servicio PaaS?",
-                options: [
-                    "Ofrecen hardware virtual",
-                    "Ofrecen un entorno de desarrollo e implementación completo",
-                    "Ofrecen una variedad de aplicaciones empresariales",
-                    "Ninguno es correcto"
-                ],
-                correctOption: 1,
-                explanation: "PaaS ofrece un entorno completo de desarrollo e implementación."
+                options: ["Ofrecen hardware virtual, desde configuraciones básicas hasta sistemas de gran eficiencia y complejidad", "Ofrecen un entorno de desarrollo e implementación completo, que permite crear desde aplicaciones sencillas hasta aplicaciones empresariales sofisticadas", "Ofrecen una variedad de aplicaciones empresariales, a las cuales se accede a través de internet y desde cualquier dispositivo", "Ninguno es correcto"],
+                answer: 1,
+                category: "Servicios en la Nube"
             },
             {
                 question: "¿Qué significa IaaS?",
-                options: [
-                    "Instrumentos como servicio",
-                    "Ingeniería como servicio",
-                    "Infraestructura como servicio",
-                    "Ninguno es correcto"
-                ],
-                correctOption: 2,
-                explanation: "IaaS significa Infraestructura como Servicio."
+                options: ["Instrumentos como servicio", "Ingeniería como servicio", "Infraestructura como servicio", "Ninguno es correcto"],
+                answer: 2,
+                category: "Servicios en la Nube"
             },
             {
-                question: "¿Cómo se denomina a la protección que se proporciona a una red?",
-                options: [
-                    "Seguridad Informática",
-                    "Seguridad de la información",
-                    "Seguridad de redes"
-                ],
-                correctOption: 2,
-                explanation: "Seguridad de redes protege la disponibilidad, confidencialidad e integridad."
+                question: "¿Cómo se denomina a la protección que se proporciona a una red para mantener la disponibilidad, la confidencialidad y la integridad de la información y los recursos de la red?",
+                options: ["Seguridad Informática", "Seguridad de la información", "Seguridad de redes"],
+                answer: 2,
+                category: "Seguridad"
             },
             {
                 question: "La virtualización permite el aprovisionamiento de aplicaciones y recursos con mayor rapidez",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 0,
-                explanation: "La virtualización agiliza el aprovisionamiento de recursos."
+                options: ["Verdadero", "Falso"],
+                answer: 0,
+                category: "Virtualización"
+            },
+            {
+                question: "Migración a IPv6: Une el gráfico con su descripción correspondiente.",
+                options: ["Traducción - NAT 64: IPv6 <ROUTERNAT64->IPv4", "Dual Stack: IPv4 e IPv6", "Tunelización: IPv6-Dual (túnel/IPv4) Dual-IPv6"],
+                answer: 0,
+                category: "Direccionamiento",
+                multiAnswer: [0, 1, 2] // Todas son correctas
             },
             {
                 question: "La telefonía IP es el servicio telefónico disponible al público, utilizando la tecnología VoIP",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 0,
-                explanation: "La telefonía IP es el servicio telefónico que utiliza VoIP."
+                options: ["Verdadero", "Falso"],
+                answer: 0,
+                category: "Protocolos"
             },
             {
                 question: "'Frente a la rigidez del hardware, la flexibilidad del software', es la premisa que usa la virtualización de redes.",
-                options: [
-                    "Verdadero",
-                    "Falso"
-                ],
-                correctOption: 0,
-                explanation: "Esta premisa describe la ventaja de la virtualización de redes."
+                options: ["Verdadero", "Falso"],
+                answer: 0,
+                category: "Virtualización"
             }
         ];
 
-        // Variables de estado
-        let currentQuestionIndex = 0;
-        let correctAnswers = 0;
-        let answeredQuestions = 0;
+        // Variables del juego
+        let questions = [];
+        let currentQuestion = 0;
+        let score = 0;
+        let timeLeft = 30;
+        let timer;
+        let userAnswers = [];
 
-        // Elementos del DOM
-        const questionTextElement = document.getElementById('question-text');
-        const optionsContainerElement = document.getElementById('options-container');
-        const explanationElement = document.getElementById('explanation');
-        const btnShowAnswer = document.getElementById('btn-show-answer');
-        const btnNext = document.getElementById('btn-next');
-        const btnAddQuestion = document.getElementById('btn-add-question');
-        const currentQuestionElement = document.getElementById('current-question');
-        const correctAnswersElement = document.getElementById('correct-answers');
-        const accuracyElement = document.getElementById('accuracy');
-        const progressBarElement = document.getElementById('progress-bar');
-        const addQuestionModal = document.getElementById('add-question-modal');
-        const addQuestionForm = document.getElementById('add-question-form');
-        const btnCancel = document.getElementById('btn-cancel');
-
-        // Cargar preguntas desde localStorage si existen
-        function loadQuestions() {
-            const savedQuestions = localStorage.getItem('securityQuestions');
-            if (savedQuestions) {
-                questions = JSON.parse(savedQuestions);
-            }
-        }
-
-        // Guardar preguntas en localStorage
-        function saveQuestions() {
-            localStorage.setItem('securityQuestions', JSON.stringify(questions));
-        }
-
-        // Mostrar la pregunta actual
-        function displayQuestion() {
-            const currentQuestion = questions[currentQuestionIndex];
-            questionTextElement.textContent = currentQuestion.question;
-            
-            // Limpiar opciones anteriores
-            optionsContainerElement.innerHTML = '';
-            
-            // Crear elementos para cada opción
-            currentQuestion.options.forEach((option, index) => {
-                const optionElement = document.createElement('div');
-                optionElement.classList.add('option');
-                optionElement.textContent = option;
-                optionElement.dataset.index = index;
-                optionElement.addEventListener('click', checkAnswer);
-                optionsContainerElement.appendChild(optionElement);
-            });
-            
-            // Ocultar explicación
-            explanationElement.style.display = 'none';
-            explanationElement.textContent = currentQuestion.explanation;
-            
-            // Actualizar estadísticas
-            currentQuestionElement.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
-            correctAnswersElement.textContent = correctAnswers;
-            accuracyElement.textContent = answeredQuestions > 0 
-                ? `${Math.round((correctAnswers / answeredQuestions) * 100)}%` 
-                : '0%';
-                
-            // Actualizar barra de progreso
-            progressBarElement.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
-        }
-
-        // Verificar respuesta seleccionada
-        function checkAnswer(event) {
-            const selectedOptionIndex = parseInt(event.target.dataset.index);
-            const correctOptionIndex = questions[currentQuestionIndex].correctOption;
-            const optionElements = document.querySelectorAll('.option');
-            
-            // Deshabilitar clics en opciones
-            optionElements.forEach(option => {
-                option.removeEventListener('click', checkAnswer);
-            });
-            
-            // Marcar opción correcta e incorrecta
-            optionElements[correctOptionIndex].classList.add('correct');
-            if (selectedOptionIndex !== correctOptionIndex) {
-                optionElements[selectedOptionIndex].classList.add('incorrect');
-            } else {
-                correctAnswers++;
-            }
-            
-            answeredQuestions++;
-            
-            // Actualizar estadísticas
-            correctAnswersElement.textContent = correctAnswers;
-            accuracyElement.textContent = answeredQuestions > 0 
-                ? `${Math.round((correctAnswers / answeredQuestions) * 100)}%` 
-                : '0%';
-                
-            // Mostrar explicación
-            explanationElement.style.display = 'block';
-        }
-
-        // Mostrar siguiente pregunta
-        function nextQuestion() {
-            currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
-            displayQuestion();
-        }
-
-        // Mostrar respuesta sin necesidad de seleccionar una opción
-        function showAnswer() {
-            const correctOptionIndex = questions[currentQuestionIndex].correctOption;
-            const optionElements = document.querySelectorAll('.option');
-            
-            // Deshabilitar clics en opciones
-            optionElements.forEach(option => {
-                option.removeEventListener('click', checkAnswer);
-            });
-            
-            // Marcar opción correcta
-            optionElements[correctOptionIndex].classList.add('correct');
-            
-            // Mostrar explicación
-            explanationElement.style.display = 'block';
-            
-            answeredQuestions++;
-            
-            // Actualizar estadísticas
-            accuracyElement.textContent = answeredQuestions > 0 
-                ? `${Math.round((correctAnswers / answeredQuestions) * 100)}%` 
-                : '0%';
-        }
-
-        // Abrir modal para añadir pregunta
-        function openAddQuestionModal() {
-            addQuestionModal.style.display = 'flex';
-        }
-
-        // Cerrar modal para añadir pregunta
-        function closeAddQuestionModal() {
-            addQuestionModal.style.display = 'none';
-            addQuestionForm.reset();
-        }
-
-        // Añadir nueva pregunta
-        function addNewQuestion(event) {
-            event.preventDefault();
-            
-            const question = document.getElementById('question').value;
-            const options = document.getElementById('options').value.split(',').map(opt => opt.trim());
-            const correctOption = parseInt(document.getElementById('correct-option').value) - 1; // Convertir a índice base 0
-            const explanation = document.getElementById('explanation-input').value;
-            
-            // Validar entrada
-            if (correctOption < 0 || correctOption >= options.length) {
-                alert('La opción correcta debe estar entre 1 y el número de opciones');
-                return;
-            }
-            
-            // Añadir nueva pregunta
-            questions.push({
-                question,
-                options,
-                correctOption,
-                explanation
-            });
-            
-            // Guardar en localStorage
-            saveQuestions();
-            
-            // Cerrar modal y resetear formulario
-            closeAddQuestionModal();
-            
-            // Actualizar estadísticas
-            currentQuestionElement.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
-            progressBarElement.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
-            
-            alert('Pregunta añadida correctamente');
-        }
+        // Elementos DOM
+        const startScreen = document.getElementById('start-screen');
+        const instructionsScreen = document.getElementById('instructions-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        
+        const startBtn = document.getElementById('start-btn');
+        const instructionsBtn = document.getElementById('instructions-btn');
+        const backBtn = document.getElementById('back-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const homeBtn = document.getElementById('home-btn');
+        
+        const questionElement = document.getElementById('question');
+        const optionsContainer = document.getElementById('options-container');
+        const questionCountElement = document.getElementById('question-count');
+        const scoreElement = document.getElementById('score');
+        const progressBar = document.getElementById('progress-bar');
+        const categoryElement = document.getElementById('category');
+        const timerElement = document.getElementById('timer');
+        const finalScoreElement = document.getElementById('final-score');
+        const resultMessageElement = document.getElementById('result-message');
+        const filterButtons = document.querySelectorAll('.filter-btn');
 
         // Event listeners
-        btnNext.addEventListener('click', nextQuestion);
-        btnShowAnswer.addEventListener('click', showAnswer);
-        btnAddQuestion.addEventListener('click', openAddQuestionModal);
-        btnCancel.addEventListener('click', closeAddQuestionModal);
-        addQuestionForm.addEventListener('submit', addNewQuestion);
+        startBtn.addEventListener('click', startGame);
+        instructionsBtn.addEventListener('click', showInstructions);
+        backBtn.addEventListener('click', showStartScreen);
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', restartGame);
+        homeBtn.addEventListener('click', showStartScreen);
 
-        // Inicializar la aplicación
-        loadQuestions();
-        displayQuestion();
+        // Filtrado por categoría
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+
+        // Funciones del juego
+        function startGame() {
+            const selectedCategory = document.querySelector('.filter-btn.active').dataset.category;
+            
+            if (selectedCategory === 'all') {
+                questions = [...allQuestions];
+            } else {
+                questions = allQuestions.filter(q => q.category === selectedCategory);
+            }
+            
+            // Mezclar preguntas
+            questions = questions.sort(() => Math.random() - 0.5);
+            
+            startScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            showQuestion();
+            startTimer();
+        }
+
+        function showInstructions() {
+            startScreen.style.display = 'none';
+            instructionsScreen.style.display = 'block';
+        }
+
+        function showStartScreen() {
+            instructionsScreen.style.display = 'none';
+            resultsScreen.style.display = 'none';
+            startScreen.style.display = 'block';
+        }
+
+        function showQuestion() {
+            resetTimer();
+            const question = questions[currentQuestion];
+            questionElement.textContent = question.question;
+            categoryElement.textContent = question.category;
+            
+            questionCountElement.textContent = `Pregunta ${currentQuestion + 1}/${questions.length}`;
+            scoreElement.textContent = `Puntuación: ${score}`;
+            
+            progressBar.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            
+            optionsContainer.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-btn');
+                button.addEventListener('click', () => selectOption(index));
+                optionsContainer.appendChild(button);
+            });
+            
+            nextBtn.style.display = 'none';
+        }
+
+        function selectOption(selectedIndex) {
+            // Deshabilitar todos los botones
+            const options = document.querySelectorAll('.option-btn');
+            options.forEach(option => {
+                option.disabled = true;
+            });
+            
+            // Marcar la opción seleccionada
+            options[selectedIndex].classList.add('selected');
+            
+            // Comprobar si es correcta
+            const question = questions[currentQuestion];
+            let isCorrect = false;
+            
+            if (question.multiAnswer) {
+                // Pregunta con múltiples respuestas correctas
+                isCorrect = question.multiAnswer.includes(selectedIndex);
+                // Marcar todas las respuestas correctas
+                question.multiAnswer.forEach(index => {
+                    options[index].classList.add('correct');
+                });
+            } else {
+                // Pregunta con una sola respuesta correcta
+                isCorrect = selectedIndex === question.answer;
+                options[question.answer].classList.add('correct');
+            }
+            
+            if (isCorrect) {
+                score++;
+                scoreElement.textContent = `Puntuación: ${score}`;
+                userAnswers.push({ question: currentQuestion, correct: true });
+            } else {
+                userAnswers.push({ question: currentQuestion, correct: false });
+            }
+            
+            // Mostrar el botón de siguiente
+            nextBtn.style.display = 'block';
+            clearInterval(timer);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion();
+                startTimer();
+            } else {
+                showResults();
+            }
+        }
+
+        function startTimer() {
+            timeLeft = 30;
+            timerElement.textContent = `Tiempo: ${timeLeft}s`;
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `Tiempo: ${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    // Seleccionar automáticamente una opción (ninguna, en este caso)
+                    const options = document.querySelectorAll('.option-btn');
+                    options.forEach(option => {
+                        option.disabled = true;
+                    });
+                    
+                    // Marcar la respuesta correcta
+                    const question = questions[currentQuestion];
+                    if (question.multiAnswer) {
+                        question.multiAnswer.forEach(index => {
+                            options[index].classList.add('correct');
+                        });
+                    } else {
+                        options[question.answer].classList.add('correct');
+                    }
+                    
+                    userAnswers.push({ question: currentQuestion, correct: false });
+                    nextBtn.style.display = 'block';
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timeLeft = 30;
+            timerElement.textContent = `Tiempo: ${timeLeft}s`;
+        }
+
+        function showResults() {
+            gameScreen.style.display = 'none';
+            resultsScreen.style.display = 'block';
+            
+            finalScoreElement.textContent = `Puntuación: ${score}/${questions.length}`;
+            
+            // Mensaje según la puntuación
+            const percentage = (score / questions.length) * 100;
+            if (percentage >= 90) {
+                resultMessageElement.textContent = '¡Excelente! Eres un experto en redes y seguridad.';
+            } else if (percentage >= 70) {
+                resultMessageElement.textContent = '¡Buen trabajo! Tienes buenos conocimientos de redes y seguridad.';
+            } else if (percentage >= 50) {
+                resultMessageElement.textContent = 'No está mal, pero podrías mejorar. Sigue estudiando.';
+            } else {
+                resultMessageElement.textContent = 'Necesitas estudiar más sobre redes y seguridad. ¡Sigue intentándolo!';
+            }
+        }
+
+        function restartGame() {
+            resultsScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            showQuestion();
+            startTimer();
+        }
     </script>
 </body>
 </html>
